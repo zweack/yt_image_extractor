@@ -60,7 +60,6 @@ def main(url):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("url", help="youtube url")
-    parser.add_argument("video", action="store_true", help="path to video")
     args = parser.parse_args()
 
     main(args.url)

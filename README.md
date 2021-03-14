@@ -11,3 +11,15 @@ git clone https://github.com/dfirsec/ytdl_img_extractor.git
 cd ytdl_img_extractor
 pip install -r requirements.txt
 ```
+
+## Usage
+
+```text
+usage: ytdl_img_extractor.py [-h] url
+
+positional arguments:
+  url         youtube url
+
+optional arguments:
+  -h, --help  show this help message and exit
+```
