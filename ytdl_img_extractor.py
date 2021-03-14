@@ -18,10 +18,19 @@ class Video_Processor:
         self.video.mkdir(parents=True, exist_ok=True)
         self.images.mkdir(parents=True, exist_ok=True)
 
-    def download_video(self, url):
+    def download_video(self, url, small=None):
         try:
-            ydl_opts = {"outtmpl": f"{self.video}/%(title)s.%(ext)s"}
-            with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            if small:
+                opts = {
+                    "format": "worst",
+                    "outtmpl": f"{self.video}/%(title)s.%(ext)s",
+                }
+            else:
+                opts = {
+                    "outtmpl": f"{self.video}/%(title)s.%(ext)s",
+                }
+
+            with youtube_dl.YoutubeDL(opts) as ydl:
                 ydl.download([url])
 
             self.extract_images()
@@ -52,9 +61,9 @@ class Video_Processor:
         print("\n[completed]")
 
 
-def main(url):
+def main(url, small):
     vp = Video_Processor()
-    vp.download_video(url)
+    vp.download_video(url, small)
 
 
 if __name__ == "__main__":
@@ -64,9 +73,10 @@ if __name__ == "__main__":
     +-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+
     """
     print(banner)
-    
+
     parser = argparse.ArgumentParser()
     parser.add_argument("url", help="youtube url")
+    parser.add_argument("-s", "--small", action="store_true", help="download lowest quality video (small size)")
     args = parser.parse_args()
 
-    main(args.url)
+    main(args.url, args.small)
