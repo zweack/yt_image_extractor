@@ -15,6 +15,10 @@ pip install -r requirements.txt
 ## Usage
 
 ```text
+    +-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+
+    | YouTube Frame/Image Extractor |
+    +-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+
+
 usage: ytdl_img_extractor.py [-h] url
 
 positional arguments:

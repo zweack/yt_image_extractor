@@ -58,6 +58,13 @@ def main(url):
 
 
 if __name__ == "__main__":
+    banner = r"""
+    +-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+
+    | YouTube Frame/Image Extractor |
+    +-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+
+    """
+    print(banner)
+    
     parser = argparse.ArgumentParser()
     parser.add_argument("url", help="youtube url")
     args = parser.parse_args()
