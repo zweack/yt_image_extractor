@@ -19,11 +19,12 @@ pip install -r requirements.txt
     | YouTube Frame/Image Extractor |
     +-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+
 
-usage: ytdl_img_extractor.py [-h] url
+usage: ytdl_img_extractor.py [-h] [-s] url
 
 positional arguments:
-  url         youtube url
+  url          youtube url
 
 optional arguments:
-  -h, --help  show this help message and exit
+  -h, --help   show this help message and exit
+  -s, --small  download lowest quality video (small size)
 ```
