@@ -14,7 +14,7 @@ pip install -r requirements.txt
 
 ## Usage
 
-```text
+```console
     +-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+
     | YouTube Frame/Image Extractor |
     +-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+
