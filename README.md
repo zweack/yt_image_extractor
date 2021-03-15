@@ -19,12 +19,13 @@ pip install -r requirements.txt
     | YouTube Frame/Image Extractor |
     +-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+
 
-usage: ytdl_img_extractor.py [-h] [-s] url
+usage: ytdl_img_extractor.py [-h] [-s] [-f [N]] url
 
 positional arguments:
   url          youtube url
 
 optional arguments:
   -h, --help   show this help message and exit
-  -s, --small  download lowest quality video (small size)
+  -s, --small  download lowest quality video (smaller size video)
+  -f [N]       images to capture per frame (default is 30 = 1 image per 30 frames)
 ```

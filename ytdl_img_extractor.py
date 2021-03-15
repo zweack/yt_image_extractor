@@ -18,7 +18,7 @@ class Video_Processor:
         self.video.mkdir(parents=True, exist_ok=True)
         self.images.mkdir(parents=True, exist_ok=True)
 
-    def download_video(self, url, small=None):
+    def download_video(self, url, small=None, fps=None):
         try:
             if small:
                 opts = {
@@ -33,14 +33,13 @@ class Video_Processor:
             with youtube_dl.YoutubeDL(opts) as ydl:
                 ydl.download([url])
 
-            self.extract_images()
+            self.extract_images(fps)
         except Exception as exc:
             print(f"[download error] {exc}")
 
-    def extract_images(self):
+    def extract_images(self, fps):
         vidfile = "".join([str(x) for x in self.video.iterdir() if x.is_file()])
         vidcap = cv2.VideoCapture(vidfile)
-        fps = round(int(vidcap.get(cv2.CAP_PROP_FPS)))
         length = int(vidcap.get(cv2.CAP_PROP_FRAME_COUNT))
 
         success, image = vidcap.read()
@@ -61,9 +60,9 @@ class Video_Processor:
         print("\n[completed]")
 
 
-def main(url, small):
+def main(url, small, fps):
     vp = Video_Processor()
-    vp.download_video(url, small)
+    vp.download_video(url, small, fps)
 
 
 if __name__ == "__main__":
@@ -74,9 +73,26 @@ if __name__ == "__main__":
     """
     print(banner)
 
+    def check_value(arg):
+        num = int(arg)
+        if num <= 0:
+            raise argparse.ArgumentTypeError("argument must be a positive interger value")
+        return num
+
     parser = argparse.ArgumentParser()
     parser.add_argument("url", help="youtube url")
-    parser.add_argument("-s", "--small", action="store_true", help="download lowest quality video (small size)")
+    parser.add_argument(
+        "-s", "--small", action="store_true", help="download lowest quality video (smaller size video)"
+    )
+    parser.add_argument(
+        "-f",
+        dest="fps",
+        metavar="N",
+        nargs="?",
+        type=check_value,
+        default=30,
+        help="images to capture per frame (default is 30 = 1 image per 30 frames)",
+    )
     args = parser.parse_args()
 
-    main(args.url, args.small)
+    main(args.url, args.small, args.fps)
