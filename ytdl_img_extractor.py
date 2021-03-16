@@ -21,16 +21,11 @@ class Video_Processor:
     def download_video(self, url, small=None, fps=None):
         try:
             if small:
-                opts = {
-                    "format": "worst",
-                    "outtmpl": f"{self.video}/%(title)s.%(ext)s",
-                }
+                ydl_opts = {"format": "worst", "outtmpl": f"{self.video}/%(title)s.%(ext)s"}
             else:
-                opts = {
-                    "outtmpl": f"{self.video}/%(title)s.%(ext)s",
-                }
+                ydl_opts = {"outtmpl": f"{self.video}/%(title)s.%(ext)s"}
 
-            with youtube_dl.YoutubeDL(opts) as ydl:
+            with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                 ydl.download([url])
 
             self.extract_images(fps)
@@ -60,25 +55,14 @@ class Video_Processor:
         print("\n[completed]")
 
 
-def main(url, small, fps):
-    vp = Video_Processor()
-    vp.download_video(url, small, fps)
+def check_value(arg):
+    num = int(arg)
+    if num <= 0:
+        raise argparse.ArgumentTypeError("argument must be a positive interger value")
+    return num
 
 
-if __name__ == "__main__":
-    banner = r"""
-    +-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+
-    | YouTube Frame/Image Extractor |
-    +-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+
-    """
-    print(banner)
-
-    def check_value(arg):
-        num = int(arg)
-        if num <= 0:
-            raise argparse.ArgumentTypeError("argument must be a positive interger value")
-        return num
-
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("url", help="youtube url")
     parser.add_argument(
@@ -95,4 +79,16 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    main(args.url, args.small, args.fps)
+    vp = Video_Processor()
+    vp.download_video(args.url, args.small, args.fps)
+
+
+if __name__ == "__main__":
+    banner = r"""
+    +-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+
+    | YouTube Frame/Image Extractor |
+    +-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+
+    """
+    print(banner)
+
+    main()
