@@ -15,9 +15,6 @@ class Video_Processor:
         self.video = parent.joinpath(str(uuid.uuid1()))
         self.images = self.video.joinpath("Images")
 
-        self.video.mkdir(parents=True, exist_ok=True)
-        self.images.mkdir(parents=True, exist_ok=True)
-
     def download_video(self, url, small=None, fps=None):
         try:
             if small:
@@ -27,10 +24,12 @@ class Video_Processor:
 
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                 ydl.download([url])
-
+        except youtube_dl.utils.DownloadError:
+            sys.exit()
+        else:
+            self.video.mkdir(parents=True, exist_ok=True)
+            self.images.mkdir(parents=True, exist_ok=True)
             self.extract_images(fps)
-        except Exception as exc:
-            print(f"[download error] {exc}")
 
     def extract_images(self, fps):
         vidfile = "".join([str(x) for x in self.video.iterdir() if x.is_file()])
