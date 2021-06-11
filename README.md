@@ -1,10 +1,10 @@
 # YouTube Frame/Image Extractor
 
-![Generic badge](https://img.shields.io/badge/python-3.7-blue.svg) [![Twitter](https://img.shields.io/badge/Twitter-@pulsecode-blue.svg)](https://twitter.com/pulsecode)
+![Generic badge](https://img.shields.io/badge/python-3.9-blue.svg) [![Twitter](https://img.shields.io/badge/Twitter-@pulsecode-blue.svg)](https://twitter.com/pulsecode)
 
 Downloads YouTube video and extracts video frames as a collection of image files
 
-Files created by script: Unique ID folder to store video and image files.
+Files created by script: Unique ID folder to store downloaded video and image files.
 
 - Requirements
   - opencv-python
