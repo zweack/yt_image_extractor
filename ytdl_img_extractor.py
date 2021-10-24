@@ -10,7 +10,7 @@ import youtube_dl
 parent = Path(__file__).resolve().parent
 
 
-class Video_Processor:
+class VideoProcessor:
     def __init__(self):
         self.video = parent.joinpath(str(uuid.uuid1()))
         self.images = self.video.joinpath("Images")
@@ -20,7 +20,7 @@ class Video_Processor:
             if small:
                 ydl_opts = {"format": "worst", "outtmpl": f"{self.video}/%(title)s.%(ext)s"}
             else:
-                ydl_opts = {"outtmpl": f"{self.video}/%(title)s.%(ext)s"}
+                ydl_opts = {"format": "best", "outtmpl": f"{self.video}/%(title)s.%(ext)s"}
 
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                 ydl.download([url])
@@ -32,21 +32,21 @@ class Video_Processor:
             self.extract_images(fps)
 
     def extract_images(self, fps):
-        vidfile = "".join([str(x) for x in self.video.iterdir() if x.is_file()])
-        vidcap = cv2.VideoCapture(vidfile)
-        length = int(vidcap.get(cv2.CAP_PROP_FRAME_COUNT))
+        video_file = "".join([str(x) for x in self.video.iterdir() if x.is_file()])
+        video_capture = cv2.VideoCapture(video_file)
+        length = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
 
-        success, image = vidcap.read()
+        success, image = video_capture.read()
         count = 0
 
         while success:
-            success, image = vidcap.read()
+            success, image = video_capture.read()
             if not success:
                 break
             try:
                 if count % fps == 0:
-                    fname = self.images.joinpath(f"frame_{str(count)}.jpg")
-                    cv2.imwrite(str(fname), image)
+                    filename = self.images.joinpath(f"frame_{str(count)}.jpg")
+                    cv2.imwrite(str(filename), image)
                     print(f"[processing frame] {count}/{length}", end="\r")
                 count += 1
             except KeyboardInterrupt:
@@ -57,7 +57,7 @@ class Video_Processor:
 def check_value(arg):
     num = int(arg)
     if num <= 0:
-        raise argparse.ArgumentTypeError("argument must be a positive interger value")
+        raise argparse.ArgumentTypeError("argument must be a positive integer value")
     return num
 
 
@@ -78,7 +78,7 @@ def main():
     )
     args = parser.parse_args()
 
-    vp = Video_Processor()
+    vp = VideoProcessor()
     vp.download_video(args.url, args.small, args.fps)
 
 
