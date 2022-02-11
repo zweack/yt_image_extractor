@@ -4,7 +4,7 @@ import uuid
 from pathlib import Path
 
 import cv2
-import youtube_dl
+from yt_dlp import YoutubeDL, utils
 
 # Base directory path
 parent = Path(__file__).resolve().parent
@@ -22,9 +22,12 @@ class VideoProcessor:
             else:
                 ydl_opts = {"format": "best", "outtmpl": f"{self.video}/%(title)s.%(ext)s"}
 
-            with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            with YoutubeDL(ydl_opts) as ydl:
                 ydl.download([url])
-        except youtube_dl.utils.DownloadError:
+
+        except utils.DownloadError:
+            sys.exit()
+        except KeyboardInterrupt:
             sys.exit()
         else:
             self.video.mkdir(parents=True, exist_ok=True)
@@ -32,7 +35,7 @@ class VideoProcessor:
             self.extract_images(fps)
 
     def extract_images(self, fps):
-        video_file = "".join([str(x) for x in self.video.iterdir() if x.is_file()])
+        video_file = "".join([str(vidobj) for vidobj in self.video.iterdir() if vidobj.is_file()])
         video_capture = cv2.VideoCapture(video_file)
         length = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
 
@@ -65,7 +68,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("url", help="youtube url")
     parser.add_argument(
-        "-s", "--small", action="store_true", help="download lowest quality video (smaller size video)"
+        "-s", "--small", action="store_true", help="download lowest quality video (smaller size video)",
     )
     parser.add_argument(
         "-f",
@@ -78,16 +81,16 @@ def main():
     )
     args = parser.parse_args()
 
-    vp = VideoProcessor()
-    vp.download_video(args.url, args.small, args.fps)
+    vidp = VideoProcessor()
+    vidp.download_video(args.url, args.small, args.fps)
 
 
 if __name__ == "__main__":
-    banner = r"""
+    BANNER = """
     +-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+
     | YouTube Frame/Image Extractor |
     +-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+
     """
-    print(banner)
+    print(BANNER)
 
     main()

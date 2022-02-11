@@ -1,2 +1,2 @@
 opencv-python
-youtube-dl
+yt-dlp
