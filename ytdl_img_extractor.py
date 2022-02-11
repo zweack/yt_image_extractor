@@ -1,3 +1,4 @@
+"""Downloads YouTube video and extracts video frames as a collection of image files."""
 import argparse
 import sys
 import uuid
@@ -10,18 +11,21 @@ from yt_dlp import YoutubeDL, utils
 parent = Path(__file__).resolve().parent
 
 
-class VideoProcessor:
+class VideoProcessor(object):
+    """Main processor."""
+
     def __init__(self):
+        """Setup video and image directories."""
         self.video = parent.joinpath(str(uuid.uuid1()))
         self.images = self.video.joinpath("Images")
 
-    def download_video(self, url, small=None, fps=None):
+    def download_video(self, url: str, small=None, fps=None):
+        """Youtube video downloader."""
+        if small:
+            ydl_opts = {"format": "worst", "outtmpl": f"{self.video}/%(title)s.%(ext)s"}
+        else:
+            ydl_opts = {"format": "best", "outtmpl": f"{self.video}/%(title)s.%(ext)s"}
         try:
-            if small:
-                ydl_opts = {"format": "worst", "outtmpl": f"{self.video}/%(title)s.%(ext)s"}
-            else:
-                ydl_opts = {"format": "best", "outtmpl": f"{self.video}/%(title)s.%(ext)s"}
-
             with YoutubeDL(ydl_opts) as ydl:
                 ydl.download([url])
 
@@ -34,14 +38,14 @@ class VideoProcessor:
             self.images.mkdir(parents=True, exist_ok=True)
             self.extract_images(fps)
 
-    def extract_images(self, fps):
+    def extract_images(self, fps: int):
+        """Extract video frames from file."""
         video_file = "".join([str(vidobj) for vidobj in self.video.iterdir() if vidobj.is_file()])
         video_capture = cv2.VideoCapture(video_file)
         length = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
 
         success, image = video_capture.read()
         count = 0
-
         while success:
             success, image = video_capture.read()
             if not success:
@@ -58,6 +62,7 @@ class VideoProcessor:
 
 
 def check_value(arg):
+    """Ensure the FPS is a positive int value."""
     num = int(arg)
     if num <= 0:
         raise argparse.ArgumentTypeError("argument must be a positive integer value")
@@ -65,10 +70,15 @@ def check_value(arg):
 
 
 def main():
+    """Argument parser/main function."""
+    fps_rate = 30
     parser = argparse.ArgumentParser()
     parser.add_argument("url", help="youtube url")
     parser.add_argument(
-        "-s", "--small", action="store_true", help="download lowest quality video (smaller size video)",
+        "-s",
+        "--small",
+        action="store_true",
+        help="download lowest quality video (smaller size video)",
     )
     parser.add_argument(
         "-f",
@@ -76,7 +86,7 @@ def main():
         metavar="N",
         nargs="?",
         type=check_value,
-        default=30,
+        default=fps_rate,
         help="images to capture per frame (default is 30 = 1 image per 30 frames)",
     )
     args = parser.parse_args()
