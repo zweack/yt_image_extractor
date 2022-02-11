@@ -6,7 +6,7 @@ Downloads YouTube video and extracts video frames as a collection of image files
 
 Files created by script: Unique ID directory to store downloaded video and image files.
 
-### Requirements
+## Requirements
 
 - opencv-python
 - yt-dlp
