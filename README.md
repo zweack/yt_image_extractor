@@ -8,7 +8,7 @@ Files created by script: Unique ID folder to store downloaded video and image fi
 
 - Requirements
   - opencv-python
-  - youtube-dl
+  - yt-dlp
 
 ## Installation
 
