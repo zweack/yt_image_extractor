@@ -11,7 +11,7 @@ from yt_dlp import YoutubeDL, utils
 parent = Path(__file__).resolve().parent
 
 
-class VideoProcessor(object):
+class VideoProcessor:
     """Main processor."""
 
     def __init__(self):
