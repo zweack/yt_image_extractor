@@ -20,7 +20,15 @@ class VideoProcessor:
         self.images = self.video.joinpath("Images")
 
     def download_video(self, url: str, small=None, fps=None):
-        """Youtube video downloader."""
+        """
+        Downloads a video from a given url and saves it in a folder called "video" in the current
+        directory.
+
+        :param url: The URL of the video you want to download
+        :type url: str
+        :param small: If True, the video will be downloaded in the worst quality
+        :param fps: Frames per second
+        """
         if small:
             ydl_opts = {"format": "worst", "outtmpl": f"{self.video}/%(title)s.%(ext)s"}
         else:
@@ -39,30 +47,43 @@ class VideoProcessor:
             self.extract_images(fps)
 
     def extract_images(self, fps: int):
-        """Extract video frames from file."""
-        video_file = "".join([str(vidobj) for vidobj in self.video.iterdir() if vidobj.is_file()])
-        video_capture = cv2.VideoCapture(video_file)
-        length = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+        """
+        Extract video frames from file.
 
-        success, image = video_capture.read()
+        :param fps: frames per second
+        :type fps: int
+        """
+        vidfile = "".join([str(vidobj) for vidobj in self.video.iterdir() if vidobj.is_file()])
+        vidcap = cv2.VideoCapture(vidfile)
+        length = int(vidcap.get(cv2.CAP_PROP_FRAME_COUNT))
+
         count = 0
-        while success:
-            success, image = video_capture.read()
-            if not success:
+        while True:
+            ret, frame = vidcap.read()
+            if not ret:
                 break
             try:
                 if count % fps == 0:
                     filename = self.images.joinpath(f"frame_{str(count)}.jpg")
-                    cv2.imwrite(str(filename), image)
+                    cv2.imwrite(str(filename), frame)
                     print(f"[processing frame] {count}/{length}", end="\r")
                 count += 1
             except KeyboardInterrupt:
+                vidcap.release()
                 sys.exit()
         print("\n[completed]")
+        vidcap.release()
 
 
 def check_value(arg):
-    """Ensure the FPS is a positive int value."""
+    """
+    Takes a string argument, converts it to an integer, and then checks to see if it's a positive
+    integer. If it is, it returns the integer. If it's not, it raises an error. This ensures the
+    FPS is a positive int value.
+
+    :param arg: The argument to be checked
+    :return: the value of the argument.
+    """
     num = int(arg)
     if num <= 0:
         raise argparse.ArgumentTypeError("argument must be a positive integer value")
