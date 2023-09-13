@@ -34,9 +34,14 @@ poetry install
 ## Usage
 
 ```console
-    +-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+
-    | YouTube Frame/Image Extractor |
-    +-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+
+    ██╗   ██╗  ██╗   ███████╗
+    ╚██╗ ██╔╝  ██║   ██╔════╝
+     ╚████╔╝   ██║   █████╗
+      ╚██╔╝    ██║   ██╔══╝
+       ██║     ██║   ███████╗
+       ╚═╝     ╚═╝   ╚══════╝
+
+     YouTube Image Extractor
 
 usage: yt_image_extractor.py [-h] [-s] [-f [N]] [--start-time START_TIME] [--end-time END_TIME] url
 ```
