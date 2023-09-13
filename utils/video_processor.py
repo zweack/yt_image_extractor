@@ -5,10 +5,13 @@ import sys
 import uuid
 from pathlib import Path
 
-from utils import restrict_to_ascii
+from rich.console import Console
 from yt_dlp import YoutubeDL
 from yt_dlp import utils
 
+from utils.helpers import restrict_to_ascii
+
+console = Console()
 parent = Path(__file__).resolve().parent
 
 
@@ -33,9 +36,13 @@ class VideoProcessor:
 
     def get_video_title(self: "VideoProcessor", url: str) -> str:
         """Get video title from YouTube URL."""
-        ydl_opts = {}
+        ydl_opts = {
+            "quiet": True,
+            "no-warnings": True,
+            "no-progress": True,
+        }
         try:
-            with YoutubeDL(ydl_opts) as ydl:
+            with console.status("[sea_green2]Getting video title..."), YoutubeDL(ydl_opts) as ydl:
                 info = ydl.extract_info(url, download=False)
                 if info is None or "title" not in info:
                     return "video"
@@ -88,6 +95,11 @@ class VideoProcessor:
 
         yt_dlp_args = [
             "yt-dlp",
+            "-q",
+            "-4",
+            "--no-warnings",
+            "-noprogress",
+            "--no-playlist",
             "-f",
             "18",
             "--downloader",
@@ -101,7 +113,8 @@ class VideoProcessor:
             *args,
         ]
 
-        result = subprocess.call(yt_dlp_args)  # noqa: S603
+        with console.status("[sea_green2]Downloading video..."):
+            result = subprocess.call(yt_dlp_args)  # noqa: S603
         if result != 0:
             print("Error: Could not download the video with given timeframe.")
             sys.exit(1)
@@ -120,17 +133,29 @@ class VideoProcessor:
             print("Error: No video files found in the video directory.")
             return
 
-        frame_rate = 1.0 / fps if fps else 1.0
         output_file_pattern = str(self.images_dir.joinpath("frame_%d.png"))
-        command = ["ffmpeg", "-i", vidfile, "-vf", f"fps={frame_rate}", output_file_pattern]
+        command = [
+            "ffmpeg",
+            "-y",
+            "-i",
+            vidfile,
+            "-vf",
+            f"fps={fps}",
+            "-loglevel",
+            "error",
+            output_file_pattern,
+        ]
 
-        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)  # noqa: S603
-        stdout, stderr = process.communicate()
+        with console.status("[sea_green2]Extracting frames..."):
+            process = subprocess.run(command, capture_output=True, text=True)  # noqa: S603, PLW1510
 
-        if stdout:
-            print(stdout.decode("utf-8"))
+            if "Error" in process.stderr:
+                print("Error:", process.stderr)
 
-        if stderr:
-            print("Error:", stderr.decode("utf-8"))
+            if process.stdout:
+                print(process.stdout)
 
-    print("\n[completed]")
+            if process.stderr:
+                print("Error:", process.stderr)
+
+        console.print("[sea_green2]Done!")

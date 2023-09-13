@@ -1,10 +1,13 @@
 """Downloads YouTube video and extracts video frames as a collection of image files."""
 
 import argparse
+from rich.console import Console
 
-from utils import check_value
-from utils import is_ffmpeg_installed
-from video_processor import VideoProcessor
+from utils.helpers import check_value
+from utils.helpers import is_ffmpeg_installed
+from utils.video_processor import VideoProcessor
+
+console = Console()
 
 
 def main() -> None:
@@ -46,15 +49,21 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    BANNER = """
-    +-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+
-    | YouTube Frame/Image Extractor |
-    +-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+
-    """
-    print(BANNER)
+    banner = """
+    ██╗   ██╗  ██╗   ███████╗
+    ╚██╗ ██╔╝  ██║   ██╔════╝
+     ╚████╔╝   ██║   █████╗
+      ╚██╔╝    ██║   ██╔══╝
+       ██║     ██║   ███████╗
+       ╚═╝     ╚═╝   ╚══════╝
+
+     YouTube Image Extractor
+"""
+    console.print(banner, style="pale_turquoise1")
     if not is_ffmpeg_installed():
         print(
             "Error: ffmpeg is not installed or not available in the system PATH. "
             "Please install it before proceeding.",
         )
+
     main()
