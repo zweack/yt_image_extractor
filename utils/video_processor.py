@@ -12,7 +12,7 @@ from yt_dlp import utils
 from utils.helpers import restrict_to_ascii
 
 console = Console()
-parent = Path(__file__).resolve().parent
+parent = Path(__file__).resolve().parent.parent
 
 
 class VideoProcessor:
@@ -46,6 +46,7 @@ class VideoProcessor:
                 info = ydl.extract_info(url, download=False)
                 if info is None or "title" not in info:
                     return "video"
+                console.print(f"  Video Title: '{info['title']}'", style="gold1")
                 return restrict_to_ascii(info["title"])
         except utils.DownloadError:
             print("Error: Invalid URL")
@@ -158,4 +159,4 @@ class VideoProcessor:
             if process.stderr:
                 print("Error:", process.stderr)
 
-        console.print("[sea_green2]Done!")
+        console.print("[sea_green2]  Done!")

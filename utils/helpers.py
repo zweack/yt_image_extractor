@@ -1,5 +1,6 @@
 """Utility functions for ytdl_img_extractor."""
 
+import string
 import subprocess
 
 
@@ -36,4 +37,4 @@ def check_value(arg: str) -> int:
 
 def restrict_to_ascii(title: str) -> str:
     """Restrict the title to ASCII characters and replace spaces with underscores."""
-    return "".join(char if char.isascii() and char != " " else "_" for char in title)
+    return "".join(char if char.isascii() and char != " " and char not in string.punctuation else "_" for char in title)
