@@ -1,2 +1,3 @@
 # exclude directories
 **/
+poetry.lock
