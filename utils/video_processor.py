@@ -2,6 +2,7 @@
 
 import subprocess
 import sys
+import re
 import uuid
 from pathlib import Path
 
@@ -20,7 +21,9 @@ class VideoProcessor:
 
     def __init__(self: "VideoProcessor") -> None:
         """Setup video and image directories."""
-        self.video_dir = parent.joinpath(str(uuid.uuid4()))  # default to a random directory name
+        self.video_dir = parent.joinpath(
+            str(uuid.uuid4())
+        )  # default to a random directory name
         self.images_dir = None
         self.user_agent = (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -42,7 +45,9 @@ class VideoProcessor:
             "no-progress": True,
         }
         try:
-            with console.status("[sea_green2]Getting video title..."), YoutubeDL(ydl_opts) as ydl:
+            with console.status("[sea_green2]Getting video title..."), YoutubeDL(
+                ydl_opts
+            ) as ydl:
                 info = ydl.extract_info(url, download=False)
                 if info is None or "title" not in info:
                     return "video"
@@ -55,10 +60,34 @@ class VideoProcessor:
             print("Exited: KeyboardInterrupt")
             sys.exit()
 
-    def download_video(self: "VideoProcessor", url: str, small: bool | None, fps: int) -> None:
+    def get_video_id(self: "VideoProcessor", url: str) -> str:
+        """Get video id from YouTube URL."""
+
+        try:
+            pattern = (
+                r"(?:https?://)?(?:www\.)?(?:youtube\.com/watch\?v=|youtu\.be/)([\w-]+)"
+            )
+            match = re.search(pattern, url)
+
+            if match:
+                return match.group(1)
+            else:
+                raise Exception("Invalid operation")
+
+        except KeyboardInterrupt:
+            print("Exited: KeyboardInterrupt")
+            sys.exit()
+        except Exception:
+            print("Error: Invalid URL")
+            sys.exit()
+
+    def download_video(
+        self: "VideoProcessor", url: str, small: bool | None, fps: int
+    ) -> None:
         """Download video and extract images."""
         video_title = self.get_video_title(url)
-        self.create_directories(video_title)
+        video_id = self.get_video_id(url)
+        self.create_directories(video_id)
 
         ydl_opts = {
             "format": "worst" if small else "best",
@@ -69,7 +98,9 @@ class VideoProcessor:
         try:
             with YoutubeDL(ydl_opts) as ydl:
                 ydl.download([url])
-                self.video_filename = ydl.prepare_filename(ydl.extract_info(url, download=False))
+                self.video_filename = ydl.prepare_filename(
+                    ydl.extract_info(url, download=False)
+                )
 
         except utils.DownloadError:
             print("Error: Invalid URL")
@@ -92,7 +123,9 @@ class VideoProcessor:
         video_title = self.get_video_title(url)
         self.create_directories(video_title)
 
-        external_downloader_args = f'-ss {start} -to {end} -user_agent "{self.user_agent}"'
+        external_downloader_args = (
+            f'-ss {start} -to {end} -user_agent "{self.user_agent}"'
+        )
 
         yt_dlp_args = [
             "yt-dlp",
@@ -129,7 +162,9 @@ class VideoProcessor:
             print("Error: Image directory not properly initialized.")
             return
 
-        vidfile = "".join([str(vidobj) for vidobj in self.video_dir.iterdir() if vidobj.is_file()])
+        vidfile = "".join(
+            [str(vidobj) for vidobj in self.video_dir.iterdir() if vidobj.is_file()]
+        )
         if not vidfile:
             print("Error: No video files found in the video directory.")
             return
@@ -148,7 +183,9 @@ class VideoProcessor:
         ]
 
         with console.status("[sea_green2]Extracting frames..."):
-            process = subprocess.run(command, capture_output=True, text=True)  # noqa: S603, PLW1510
+            process = subprocess.run(
+                command, capture_output=True, text=True
+            )  # noqa: S603, PLW1510
 
             if "Error" in process.stderr:
                 print("Error:", process.stderr)
