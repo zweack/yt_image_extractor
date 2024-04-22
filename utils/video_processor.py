@@ -2,6 +2,7 @@
 
 import subprocess
 import sys
+import os
 import re
 import uuid
 from pathlib import Path
@@ -25,6 +26,7 @@ class VideoProcessor:
             str(uuid.uuid4())
         )  # default to a random directory name
         self.images_dir = None
+        self.video_title = ""
         self.user_agent = (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
             "(KHTML, Like Gecko) Chrome/48.0.2564.82 Safari/537.36 Edge/14.14316"
@@ -52,7 +54,7 @@ class VideoProcessor:
                 if info is None or "title" not in info:
                     return "video"
                 console.print(f"  Video Title: '{info['title']}'", style="gold1")
-                return restrict_to_ascii(info["title"])
+                return restrict_to_ascii(info["title"]), str(info["title"])
         except utils.DownloadError:
             print("Error: Invalid URL")
             sys.exit()
@@ -85,7 +87,7 @@ class VideoProcessor:
         self: "VideoProcessor", url: str, small: bool | None, fps: int
     ) -> None:
         """Download video and extract images."""
-        video_title = self.get_video_title(url)
+        _, self.video_title = self.get_video_title(url)
         video_id = self.get_video_id(url)
         self.create_directories(video_id)
 
@@ -120,7 +122,7 @@ class VideoProcessor:
         *args: str | list[str],
     ) -> None:
         """Download a video from YouTube and extract a specific timeframe."""
-        video_title = self.get_video_title(url)
+        video_title, _ = self.get_video_title(url)
         self.create_directories(video_title)
 
         external_downloader_args = (
@@ -195,5 +197,10 @@ class VideoProcessor:
 
             if process.stderr:
                 print("Error:", process.stderr)
-
+        try:
+            file_path = str(self.video_dir.joinpath(f"{self.video_title}.mp4"))
+            print(f"Deleting video file: {file_path}")
+            os.remove(file_path)
+        except Exception as e:
+            print("Unable to delete video file: ", e)
         console.print("[sea_green2]  Done!")
