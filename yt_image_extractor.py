@@ -26,7 +26,7 @@ def main() -> None:
         dest="fps",
         metavar="N",
         nargs="?",
-        type=check_value,
+        # type=check_value,
         default=fps_rate,
         help="images to capture per frame (default is 30 = 1 image per 30 frames)",
     )
@@ -38,14 +38,18 @@ def main() -> None:
         "--end-time",
         help="end time for video timeframe (format: HH:MM:SS)",
     )
+    parser.add_argument(
+        "--rm",
+        help="remove video after extracting images",
+    )
     args = parser.parse_args()
 
     vidp = VideoProcessor()
 
     if args.start_time and args.end_time:
-        vidp.video_timeframe_downloader(args.url, args.start_time, args.end_time, args.fps)
+        vidp.video_timeframe_downloader(args.url, args.start_time, args.end_time, args.fps, args.rm)
     else:
-        vidp.download_video(args.url, args.small, args.fps)
+        vidp.download_video(args.url, args.small, args.fps, args.rm)
 
 
 if __name__ == "__main__":
