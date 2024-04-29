@@ -84,7 +84,11 @@ class VideoProcessor:
             sys.exit()
 
     def download_video(
-        self: "VideoProcessor", url: str, small: bool | None, fps: int
+        self: "VideoProcessor",
+        url: str,
+        small: bool | None,
+        fps: str,
+        remove: bool | None,
     ) -> None:
         """Download video and extract images."""
         _, self.video_title = self.get_video_title(url)
@@ -111,14 +115,15 @@ class VideoProcessor:
             print("Exited: KeyboardInterrupt")
             sys.exit(1)
         else:
-            self.extract_images(fps)
+            self.extract_images(fps, remove)
 
     def video_timeframe_downloader(
         self: "VideoProcessor",
         url: str,
         start: str,
         end: str,
-        fps: int,
+        fps: str,
+        remove: bool | None,
         *args: str | list[str],
     ) -> None:
         """Download a video from YouTube and extract a specific timeframe."""
@@ -156,9 +161,9 @@ class VideoProcessor:
             sys.exit(1)
 
         self.video_filename = str(self.video_dir.joinpath(f"{video_title}.mp4"))
-        self.extract_images(fps)
+        self.extract_images(fps, remove)
 
-    def extract_images(self: "VideoProcessor", fps: int) -> None:
+    def extract_images(self: "VideoProcessor", fps: str, remove: bool | None) -> None:
         """Extract frames from video using ffmpeg."""
         if not self.images_dir:
             print("Error: Image directory not properly initialized.")
@@ -197,10 +202,11 @@ class VideoProcessor:
 
             if process.stderr:
                 print("Error:", process.stderr)
-        try:
-            file_path = str(self.video_dir.joinpath(f"{self.video_title}.mp4"))
-            print(f"Deleting video file: {file_path}")
-            os.remove(file_path)
-        except Exception as e:
-            print("Unable to delete video file: ", e)
+        if remove:
+            try:
+                file_path = str(self.video_dir.joinpath(f"{self.video_title}.mp4"))
+                console.print(f"Deleting video file: {file_path}")
+                os.remove(file_path)
+            except Exception as e:
+                console.print("Unable to delete video file: ", e)
         console.print("[sea_green2]  Done!")
